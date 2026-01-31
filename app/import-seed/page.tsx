@@ -9,7 +9,7 @@ const Page = () => {
   const handleImportFinished = () => {
     // This function runs when the wallet is secured
     console.log("Wallet imported successfully!");
-    router.push("/dashboard"); // Redirect to your dashboard route
+    router.push("/wallet"); // Redirect to your dashboard route
   };
 
   return (
