@@ -44,7 +44,7 @@ const ViewSeedPhrase = () => {
       >
         {/* Navigation Header */}
         <div className="flex justify-between items-center mb-8 px-2">
-          <Link href="/dashboard" className="flex items-center gap-2 text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
+          <Link href="/wallet" className="flex items-center gap-2 text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
             <ArrowLeft size={14} /> Back to Vault
           </Link>
           <div className="h-px flex-1 bg-white/5 mx-4" />

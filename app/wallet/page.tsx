@@ -1,7 +1,7 @@
-import CreateAccount from "@/components/CreateAccount";
+import SolanaWallet from "@/components/SolanaWallet";
 
 const page = () => {
-  return <CreateAccount />;
+  return <SolanaWallet />;
 };
 
 export default page;
