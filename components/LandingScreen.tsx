@@ -37,7 +37,7 @@ export default function LandingPage() {
             </span>
           </motion.div>
 
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+          {/* <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
             {["Features", "Security", "Ecosystem"].map((item) => (
               <a
                 key={item}
@@ -51,7 +51,7 @@ export default function LandingPage() {
             <button className="px-5 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full hover:bg-indigo-500 hover:text-white transition-all duration-300">
               Connect
             </button>
-          </div>
+          </div> */}
         </div>
       </nav>
 
