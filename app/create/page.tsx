@@ -1,4 +1,4 @@
-import MnemonicGenerator from "@/components/MnemonicGenerator";
+import MnemonicGenerator from "@/components/organisms/MnemonicGenerator";
 
 const page = () => {
   return <MnemonicGenerator />;

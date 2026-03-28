@@ -1,4 +1,4 @@
-import ViewSeedPhrase from "@/components/ViewSeedPhrase";
+import ViewSeedPhrase from "@/components/organisms/ViewSeedPhrase";
 import React from "react";
 
 const page = () => {

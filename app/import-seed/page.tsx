@@ -1,5 +1,5 @@
 "use client";
-import ImportWallet from "@/components/ImportSeed";
+import ImportWallet from "@/components/organisms/ImportSeed";
 import React from "react";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +13,7 @@ const Page = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
       <ImportWallet onImportSuccess={handleImportFinished} />
     </div>
   );

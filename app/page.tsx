@@ -1,5 +1,4 @@
-import LandingPage from "@/components/LandingScreen";
-
+import LandingPage from "@/components/organisms/LandingScreen";
 
 export default function Home() {
   return (
