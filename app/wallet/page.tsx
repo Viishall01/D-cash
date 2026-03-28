@@ -1,4 +1,4 @@
-import SolanaWallet from "@/components/SolanaWallet";
+import SolanaWallet from "@/components/organisms/SolanaWallet";
 
 const page = () => {
   return <SolanaWallet />;

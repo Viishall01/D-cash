@@ -16,7 +16,6 @@ import {
 import bs58 from "bs58";
 import {
   Plus,
-  Wallet,
   Send,
   Eye,
   EyeOff,
@@ -25,11 +24,13 @@ import {
   ExternalLink,
   ArrowUpRight,
   Menu,
-  X,
   ChevronRight,
 } from "lucide-react";
 import { loadAndDecrypt } from "@/lib/encryption";
 import { useRouter } from "next/navigation";
+import { colors } from "@/lib/colors";
+import { Text, Button, Input, Card, Badge, IconBox } from "@/components/atoms";
+import { WalletAccountCard, BalanceDisplay } from "@/components/molecules";
 
 interface Account {
   address: string;
@@ -144,61 +145,61 @@ export default function SolanaWallet() {
       setAmount("");
       setRecipient("");
       fetchBalances(accounts);
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : "Transaction failed");
     } finally {
       setIsSending(false);
     }
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#050507] p-6">
+    <div
+      className="flex flex-col h-full p-6"
+      style={{ backgroundColor: colors.bg.tertiary }}
+    >
       <div className="flex items-center justify-between mb-8">
-        <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+        <Text variant="label" color="subtle">
           Wallets
-        </h3>
+        </Text>
         <button
           onClick={createNewAccount}
-          className="p-2 hover:bg-white/5 rounded-lg text-indigo-400"
+          className="p-2 rounded-lg transition-colors"
+          style={{ color: colors.text.indigo }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = colors.bg.input)
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
           <Plus size={20} />
         </button>
       </div>
       <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
         {accounts.map((acc) => (
-          <div
+          <WalletAccountCard
             key={acc.index}
+            index={acc.index}
+            address={acc.address}
+            balance={balances[acc.address]}
+            isSelected={selectedAccount?.address === acc.address}
             onClick={() => {
               setSelectedAccount(acc);
               setIsSidebarOpen(false);
               setAmount("");
               setRecipient("");
             }}
-            className={`p-4 rounded-2xl cursor-pointer border transition-all ${
-              selectedAccount?.address === acc.address
-                ? "bg-indigo-600/40 border-indigo-500/90"
-                : "bg-white/[0.02] border-white/5 hover:border-white/10"
-            }`}
-          >
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-slate-100">
-                Acc #{acc.index + 1}
-              </span>
-              <span className="text-xs font-mono font-bold text-white">
-                {balances[acc.address]?.toFixed(2) || "0.00"}
-              </span>
-            </div>
-            <p className="text-[10px] font-mono text-slate-400 truncate">
-              {acc.address}
-            </p>
-          </div>
+          />
         ))}
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#020203] text-white selection:bg-indigo-500/30">
+    <div
+      className="min-h-screen selection:bg-indigo-500/30"
+      style={{ backgroundColor: colors.bg.primary, color: colors.text.primary }}
+    >
       <AnimatePresence mode="wait">
         {!isUnlocked ? (
           <motion.div
@@ -208,36 +209,47 @@ export default function SolanaWallet() {
             className="flex h-screen items-center justify-center p-6"
           >
             <div className="w-full max-w-sm space-y-8 text-center">
-              <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
-                <Shield size={40} className="text-indigo-400" />
-              </div>
+              <IconBox
+                size="xl"
+                variant="brand"
+                className="mx-auto rounded-3xl"
+              >
+                <Shield size={40} style={{ color: colors.text.indigo }} />
+              </IconBox>
               <div className="space-y-2">
-                <h2 className="text-3xl font-black tracking-tight">
-                  Unlock Vault
-                </h2>
-                <p className="text-slate-500 text-sm">
+                <Text variant="h3">Unlock Vault</Text>
+                <Text variant="body-sm" color="subtle">
                   Enter password to decrypt your local keys
-                </p>
+                </Text>
               </div>
-              <input
-                type="password"
-                className="w-full bg-[#0a0a0c] border border-white/10 rounded-2xl p-5 outline-none focus:ring-2 focus:ring-indigo-500 text-center text-2xl tracking-widest"
+              <Input
+                variant="password"
+                inputSize="lg"
                 placeholder="••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
+                className="text-2xl"
               />
-              <button
+              <Button
+                variant="primary"
+                fullWidth
+                size="xl"
                 onClick={handleUnlock}
-                className="w-full bg-white text-black py-5 rounded-2xl font-black hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
+                icon={<ArrowUpRight size={20} />}
               >
-                AUTHENTICATE <ArrowUpRight size={20} />
-              </button>
+                AUTHENTICATE
+              </Button>
             </div>
           </motion.div>
         ) : (
           <div className="flex h-screen overflow-hidden">
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-80 border-r border-white/5 shrink-0">
+            <aside
+              className="hidden lg:block w-80 shrink-0"
+              style={{ borderRight: `1px solid ${colors.border.subtle}` }}
+            >
               <SidebarContent />
             </aside>
 
@@ -250,7 +262,8 @@ export default function SolanaWallet() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={() => setIsSidebarOpen(false)}
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden"
+                    className="fixed inset-0 backdrop-blur-sm z-40 lg:hidden"
+                    style={{ backgroundColor: colors.bg.overlay }}
                   />
                   <motion.aside
                     initial={{ x: "-100%" }}
@@ -266,39 +279,57 @@ export default function SolanaWallet() {
             </AnimatePresence>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 bg-[#020203] relative">
+            <main
+              className="flex-1 flex flex-col min-w-0 relative"
+              style={{ backgroundColor: colors.bg.primary }}
+            >
               {/* Header */}
-              <header className="h-20 border-b border-white/5 flex items-center justify-between px-6 md:px-10 shrink-0 bg-[#050507]/50 backdrop-blur-md sticky top-0 z-30">
+              <header
+                className="h-20 flex items-center justify-between px-6 md:px-10 shrink-0 backdrop-blur-md sticky top-0 z-30"
+                style={{
+                  borderBottom: `1px solid ${colors.border.subtle}`,
+                  backgroundColor: `${colors.bg.tertiary}80`,
+                }}
+              >
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setIsSidebarOpen(true)}
-                    className="lg:hidden p-2 hover:bg-white/5 rounded-xl"
+                    className="lg:hidden p-2 rounded-xl"
+                    style={{ color: colors.text.primary }}
                   >
                     <Menu size={24} />
                   </button>
-                  <h1 className="text-xl font-black tracking-tighter hidden md:block">
+                  <Text
+                    variant="h4"
+                    className="text-xl font-black tracking-tighter hidden md:block"
+                  >
                     SOLANA VAULT
-                  </h1>
-                  <span className="text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-md uppercase tracking-widest">
-                    Devnet
-                  </span>
+                  </Text>
+                  <Badge variant="success">Devnet</Badge>
                 </div>
                 <div className="flex items-center gap-3">
-                  {/* View Seed */}
-                  <button
+                  <Button
+                    variant="brand"
+                    size="sm"
+                    icon={<Eye size={16} />}
+                    iconPosition="left"
                     onClick={() => router.push("/seed")}
-                    className={`flex items-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 active:scale-95`}
+                    className="uppercase tracking-widest font-black text-xs"
                   >
-                    <Eye size={16} />
                     View Seed
-                  </button>
+                  </Button>
                   <button
                     onClick={() => fetchBalances(accounts)}
-                    className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
+                    className="p-3 rounded-xl transition-all"
+                    style={{
+                      backgroundColor: colors.bg.input,
+                      border: `1px solid ${colors.border.primary}`,
+                    }}
                   >
                     <RefreshCw
                       size={20}
                       className={isLoadingBalance ? "animate-spin" : ""}
+                      style={{ color: colors.text.primary }}
                     />
                   </button>
                 </div>
@@ -314,108 +345,85 @@ export default function SolanaWallet() {
                       className="max-w-4xl mx-auto space-y-12"
                     >
                       {/* Hero Balance Section */}
-                      <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2 text-indigo-400">
-                            <Wallet size={18} />
-                            <span className="text-xs font-black uppercase tracking-widest">
-                              Account #{selectedAccount.index + 1}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3 group">
-                            <p className="text-xs font-mono text-slate-500 break-all">
-                              {selectedAccount.address}
-                            </p>
-                            <ExternalLink
-                              size={14}
-                              className="text-slate-700 group-hover:text-white cursor-pointer"
-                              onClick={async () => {
-                                await navigator.clipboard.writeText(
-                                  selectedAccount?.address,
-                                );
-                                alert(
-                                  `Public Key Copied - ${selectedAccount.address}`,
-                                );
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className="text-left md:text-right">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-1">
-                            Available Balance
-                          </p>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-6xl font-black tracking-tighter">
-                              {balances[selectedAccount.address]?.toFixed(4) ||
-                                "0.0000"}
-                            </span>
-                            <span className="text-xl font-bold text-indigo-500 uppercase">
-                              Sol
-                            </span>
-                          </div>
-                        </div>
-                      </section>
+                      <BalanceDisplay
+                        balance={balances[selectedAccount.address] || 0}
+                        symbol="Sol"
+                        accountIndex={selectedAccount.index}
+                        address={selectedAccount.address}
+                      />
 
                       {/* Action Grid */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                         {/* Send Form */}
-                        <div className="bg-[#0a0a0c] border border-white/5 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-                          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-20" />
-                          <h3 className="text-xl font-bold mb-8 flex items-center gap-3">
-                            <Send size={20} className="text-indigo-400" /> Send
-                            Assets
-                          </h3>
+                        <Card variant="elevated" rounded="xl" padding="md">
+                          <div
+                            className="absolute top-0 left-0 w-full h-1 opacity-20"
+                            style={{ background: colors.gradient.brand }}
+                          />
+                          <div className="flex items-center gap-3 mb-8">
+                            <Send
+                              size={20}
+                              style={{ color: colors.text.indigo }}
+                            />
+                            <Text variant="h4">Send Assets</Text>
+                          </div>
                           <div className="space-y-6">
-                            <div className="space-y-2">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                                Recipient Address
-                              </label>
-                              <input
-                                type="text"
-                                className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm placeholder:text-slate-700"
-                                placeholder="Paste Solana Address"
-                                value={recipient}
-                                onChange={(e) => setRecipient(e.target.value)}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                                Amount
-                              </label>
-                              <div className="relative">
-                                <input
-                                  type="number"
-                                  className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm pr-16"
-                                  placeholder="0.00"
-                                  value={amount}
-                                  onChange={(e) => setAmount(e.target.value)}
-                                />
-                                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">
-                                  SOL
-                                </span>
-                              </div>
-                            </div>
-                            <button
+                            <Input
+                              label="Recipient Address"
+                              placeholder="Paste Solana Address"
+                              value={recipient}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => setRecipient(e.target.value)}
+                              inputSize="lg"
+                            />
+                            <Input
+                              label="Amount"
+                              type="number"
+                              placeholder="0.00"
+                              value={amount}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => setAmount(e.target.value)}
+                              suffix="SOL"
+                              inputSize="lg"
+                            />
+                            <Button
+                              variant="primary"
+                              fullWidth
+                              size="xl"
                               disabled={isSending}
                               onClick={handleSendSOL}
-                              className="w-full py-5 bg-white text-black rounded-2xl font-black text-sm uppercase tracking-[0.2em] hover:bg-indigo-50 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                              className="uppercase tracking-[0.2em] text-sm"
                             >
                               {isSending ? (
                                 <RefreshCw className="animate-spin" size={18} />
                               ) : (
                                 "Send Transaction"
                               )}
-                            </button>
+                            </Button>
                           </div>
-                        </div>
+                        </Card>
 
                         {/* Private Key Card */}
                         <div className="space-y-6">
-                          <div className="bg-indigo-600/5 border border-indigo-500/10 p-8 rounded-[2.5rem] space-y-4">
+                          <div
+                            className="p-8 rounded-[2.5rem] space-y-4"
+                            style={{
+                              backgroundColor: colors.brand.indigoMuted,
+                              border: `1px solid ${colors.brand.indigoBorder}`,
+                            }}
+                          >
                             <div className="flex justify-between items-center">
-                              <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <Shield size={16} /> Security
-                              </h3>
+                              <div className="flex items-center gap-2">
+                                <Shield
+                                  size={16}
+                                  style={{ color: colors.text.muted }}
+                                />
+                                <Text variant="overline" color="muted">
+                                  Security
+                                </Text>
+                              </div>
                               <button
                                 onClick={() =>
                                   setShowPrivate(
@@ -424,7 +432,8 @@ export default function SolanaWallet() {
                                       : selectedAccount.index,
                                   )
                                 }
-                                className="p-2 hover:bg-white/5 rounded-lg text-slate-500 transition-colors"
+                                className="p-2 rounded-lg transition-colors"
+                                style={{ color: colors.text.subtle }}
                               >
                                 {showPrivate === selectedAccount.index ? (
                                   <EyeOff size={18} />
@@ -433,29 +442,48 @@ export default function SolanaWallet() {
                                 )}
                               </button>
                             </div>
-                            <p className="text-xs text-slate-500 leading-relaxed">
+                            <Text variant="caption" color="subtle">
                               Your private key gives full access to your funds.
                               Never share it.
-                            </p>
-                            <div className="p-4 bg-black/50 rounded-xl border border-white/5">
-                              <p className="font-mono text-xs text-indigo-300/60 break-all leading-relaxed">
+                            </Text>
+                            <div
+                              className="p-4 rounded-xl"
+                              style={{
+                                backgroundColor: "rgba(0,0,0,0.50)",
+                                border: `1px solid ${colors.border.subtle}`,
+                              }}
+                            >
+                              <Text
+                                variant="mono"
+                                className="break-all leading-relaxed"
+                                style={{ color: "rgba(129, 140, 248, 0.60)" }}
+                              >
                                 {showPrivate === selectedAccount.index
                                   ? selectedAccount.privateKey
                                   : "••••••••••••••••••••••••••••••••••••••••••••••••••••••••"}
-                              </p>
+                              </Text>
                             </div>
                           </div>
                         </div>
                       </div>
                     </motion.div>
                   ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-4 border-2 border-dashed border-white/5 rounded-[3rem]">
-                      <div className="p-6 bg-white/5 rounded-full">
+                    <div
+                      className="h-full flex flex-col items-center justify-center space-y-4 border-2 border-dashed rounded-[3rem]"
+                      style={{
+                        borderColor: colors.border.subtle,
+                        color: colors.text.disabled,
+                      }}
+                    >
+                      <div
+                        className="p-6 rounded-full"
+                        style={{ backgroundColor: colors.bg.input }}
+                      >
                         <ChevronRight size={48} className="opacity-20" />
                       </div>
-                      <p className="font-bold tracking-widest uppercase text-sm">
+                      <Text variant="overline" color="disabled">
                         Select a wallet to begin
-                      </p>
+                      </Text>
                     </div>
                   )}
                 </AnimatePresence>
@@ -473,7 +501,7 @@ export default function SolanaWallet() {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.05);
+          background: ${colors.border.subtle};
           border-radius: 20px;
         }
       `}</style>

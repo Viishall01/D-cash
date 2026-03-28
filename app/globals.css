@@ -1,8 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020203;
+  --foreground: #ffffff;
+
+  /* ─── Vault Color System (from lib/colors.ts) ─── */
+  --vault-bg-primary: #020203;
+  --vault-bg-secondary: #0a0a0c;
+  --vault-bg-tertiary: #050507;
+  --vault-bg-overlay: rgba(0, 0, 0, 0.8);
+  --vault-bg-card: rgba(255, 255, 255, 0.02);
+  --vault-bg-card-hover: rgba(255, 255, 255, 0.05);
+  --vault-bg-input: rgba(255, 255, 255, 0.05);
+
+  --vault-brand: #4f46e5;
+  --vault-brand-light: #818cf8;
+  --vault-brand-muted: rgba(79, 70, 229, 0.1);
+  --vault-brand-border: rgba(79, 70, 229, 0.2);
+  --vault-brand-glow: rgba(79, 70, 229, 0.15);
+  --vault-brand-shadow: rgba(99, 102, 241, 0.2);
+  --vault-purple: #9333ea;
+  --vault-pink: #ec4899;
+
+  --vault-text-primary: #ffffff;
+  --vault-text-secondary: #e2e8f0;
+  --vault-text-muted: #94a3b8;
+  --vault-text-subtle: #64748b;
+  --vault-text-disabled: #334155;
+  --vault-text-dark: #171717;
+  --vault-text-indigo: #818cf8;
+
+  --vault-border: rgba(255, 255, 255, 0.1);
+  --vault-border-subtle: rgba(255, 255, 255, 0.05);
+  --vault-border-focus: #4f46e5;
+
+  --vault-success: #22c55e;
+  --vault-success-muted: rgba(34, 197, 94, 0.1);
+  --vault-warning: #f59e0b;
+  --vault-warning-muted: rgba(245, 158, 11, 0.05);
+  --vault-warning-border: rgba(245, 158, 11, 0.2);
+  --vault-warning-text: rgba(253, 224, 71, 0.6);
+  --vault-error: #ef4444;
+  --vault-error-muted: rgba(248, 113, 113, 0.05);
+  --vault-error-text: #f87171;
 }
 
 @theme inline {
@@ -12,15 +52,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--vault-bg-primary);
+  color: var(--vault-text-primary);
   font-family: Arial, Helvetica, sans-serif;
 }
